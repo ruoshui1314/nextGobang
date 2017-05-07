@@ -71,11 +71,40 @@ cc.Class({
             return;
         var labelNode = stepNode.getComponent(cc.Label);
         labelNode.string  = ++this.step;
+        this.traceList.push(node);
     },
     
+    cancel: function () {
+        if (this.gameState === GAME_STATE.OVER)
+            return;
+        if (cc.exports.curType == cc.exports.NextGobangType.P2C){
+            this.cancelOneStep();
+            this.cancelOneStep();
+        }else{
+            this.cancelOneStep();
+        }
+        
+    },
+    
+    cancelOneStep:function () {
+        if (this.traceList.length > 1){
+            var node = this.traceList[this.traceList.length-1];
+            node.getComponent(cc.Sprite).spriteFrame = null;
+            var stepNode = node.getChildByName("Step");
+            stepNode.getComponent(cc.Label).string = "";
+            --this.step;
+            if(this.gameState === GAME_STATE.BLACK){
+                this.gameState = GAME_STATE.WHITE;
+            }else{
+                this.gameState = GAME_STATE.BLACK;
+            };
+            --this.traceList.length;
+        }
+    },
     onLoad: function () {
         this.step = 0;
         this.gameState = GAME_STATE.WHITE;
+        this.traceList = [];
         var self = this;
         //初始化棋盘上225个棋子节点，并为每个节点添加事件
         for(var y = 0;y<15;y++){
